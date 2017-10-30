@@ -1,0 +1,36 @@
+sudo: required
+
+services:
+  - docker
+
+language: go
+
+env:
+  global:
+    - NS_NAME=bvberkum
+    - APP_ID=arcgonaut
+    - BUILD_GOARCH="386 amd64 arm" 
+    - BUILD_GOOS="linux" 
+
+script:
+  - docker run --rm
+    -e CGO_ENABLED=true
+    -e COMPRESS_BINARY=true
+    -e BUILD_GOOS="$BUILD_GOOS"
+    -e BUILD_GOARCH="$BUILD_GOARCH"
+    -v "$(pwd -P):/src"
+    centurylink/golang-builder-cross
+
+# GitHub release upload
+deploy:
+  provider: releases
+  api_key:
+    secure: koyo4XP9IYrn2/aGvPL7kpHb3hf5SC09UKrUPR0ZphH69c/vV4t+Cg7J9wF29WGmJQxiFIUO/IlPnSdhcEL0wlzhobCZKkrA8VzKj+1Rqq6CPADgnB2KhYLgwJmrS6THQjaulbFTI6BNI0xhY3fiWfvo5z4o/OyWdCn/NgAdgExXYKPIvfIsE6wd8pRNC+po8Eya+uNxCyeUYfPHn3XjRSJUAUmOzDUD0H54wVbhQx8txl2if0qVgPj35EtvEH45A187GTIhmNjbZF46PtzZ7PgpNRSuziJpOJLhU1eTXZN1wDsMUHh5OoIqrP9y+etfcnCTAvsYi0tj/DaKRIOG/qDc3C2aowTFG7UJSRlC0vAM76Fj6oO5zIUXZkVVRgobpoE2h4H5lGKU2hLO3z1SBPca9AGRQvsMYtH1971ZPflSv9EUxF6LPocdB1xbjkMGR3ShRtWpZdapwIg6HwyH1wVHsbhPPLmXJw/ra6YVW/Uqu3EFsfX9Pe6+sfWjKL4SSq27T3hg5pNUT6za/t8hBl1GAz06ZFkyGop2bceNOzjxdQDIV0gecN3v8sjSZXSD9A/7vAtAVL3+Lfdo0aHXnBSpjSWArLIMvOqzJfeltT2yaEuix1ndcVIPOkOIC0a9kHXwzm0u1WUGgSy7+9W8v4EdL/yOQ3r4yeEDlrISeBY=
+  skip_cleanup: true
+  file:
+    - $APP_ID-linux-amd64
+    - $APP_ID-linux-386
+    - $APP_ID-linux-arm
+  on:
+    repo: $NS_NAME/$APP_ID
+    tags: true # Create releases from version tags always seems to work
